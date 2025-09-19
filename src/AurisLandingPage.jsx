@@ -3,13 +3,44 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowRight, Database, Globe, Target, Eye, Heart, CheckCircle, Star, Users } from 'lucide-react'
+import { ArrowRight, Database, Globe, Target, Eye, Heart, CheckCircle, Star, Users, Search } from 'lucide-react'
 import LOGOCompleto from '../public/logo_completo_auris.svg'
 import LOGOSOLO from '../public/logo_solo_auris.svg'
 
 export default function AurisLandingPage() {
-return (
-    <div className="min-h-screen w-full bg-background text-foreground">
+    const [query, setQuery] = React.useState('')
+    const [lightboxIndex, setLightboxIndex] = React.useState(-1)
+    const [mobileOpen, setMobileOpen] = React.useState(false)
+
+    const recursos = [
+        { id: 1, title: 'Cómo diseñamos un MVP', excerpt: 'Proceso de discovery, prototipado y desarrollo iterativo para validar ideas rápidamente.' },
+        { id: 2, title: 'Buenas prácticas API', excerpt: 'Cómo diseñar APIs seguras, documentadas y fáciles de consumir.' },
+        { id: 3, title: 'Escalabilidad en la nube', excerpt: 'Patrones para escalar aplicaciones y gestionar cargas variables.' },
+        { id: 4, title: 'Optimización de rendimiento', excerpt: 'Técnicas para mejorar la performance en front y back.' },
+    ]
+
+    const images = [
+        { src: '/public/galeria_animalis.webp', alt: 'Proyecto 1' },
+        { src: '/public/asis_control_galeria.webp', alt: 'Proyecto 2' },
+        { src: '/public/black_clasick_galeria.webp', alt: 'Proyecto 3' },
+    ]
+
+    const filtered = recursos.filter(r => (r.title + r.excerpt).toLowerCase().includes(query.toLowerCase()))
+
+    React.useEffect(() => {
+        if (lightboxIndex >= 0) {
+            const onKey = (e) => {
+                if (e.key === 'Escape') setLightboxIndex(-1)
+                if (e.key === 'ArrowLeft') setLightboxIndex((i) => (i - 1 + images.length) % images.length)
+                if (e.key === 'ArrowRight') setLightboxIndex((i) => (i + 1) % images.length)
+            }
+            window.addEventListener('keydown', onKey)
+            return () => window.removeEventListener('keydown', onKey)
+        }
+    }, [lightboxIndex])
+
+    return (
+        <div className="min-h-screen w-full bg-background text-foreground">
         <header className="border-b border-border w-full">
             <div className="container mx-auto px-4 py-4 flex items-center justify-between w-full">
                 <div className="flex items-center space-x-2">
@@ -21,15 +52,35 @@ return (
                     <a href="#nosotros" className="text-foreground hover:text-primary transition-colors">Sobre Nosotros</a>
                     <a href="#equipo" className="text-foreground hover:text-primary transition-colors">Equipo</a>
                 </nav>
-                <Button
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                    as="a"
-                    href="#contacto"
-                >
-                    Contáctanos
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+                <div className="md:hidden">
+                    <button onClick={() => setMobileOpen((s) => !s)} className="p-2 rounded-md bg-muted">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+                <div className="hidden md:block">
+                    <Button
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                        as="a"
+                        href="#contacto"
+                    >
+                        Contáctanos
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                </div>
             </div>
+            {mobileOpen && (
+                <div className="md:hidden border-t border-border">
+                    <div className="px-4 py-3 space-y-2">
+                        <a href="#inicio" onClick={() => setMobileOpen(false)} className="block">Inicio</a>
+                        <a href="#servicios" onClick={() => setMobileOpen(false)} className="block">Servicios</a>
+                        <a href="#nosotros" onClick={() => setMobileOpen(false)} className="block">Sobre Nosotros</a>
+                        <a href="#equipo" onClick={() => setMobileOpen(false)} className="block">Equipo</a>
+                        <a href="#contacto" onClick={() => setMobileOpen(false)} className="block font-medium">Contáctanos</a>
+                    </div>
+                </div>
+            )}
         </header>
 
         <section id="inicio" className="py-20 lg:py-32 w-full">
@@ -45,7 +96,7 @@ return (
                             que impulsan la eficiencia operativa, mejoran la experiencia de los usuarios y aceleran el crecimiento
                             de tu organización.
                         </p>
-                        <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                        <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground w-full sm:w-auto">
                             Conoce Nuestros Servicios
                             <ArrowRight className="ml-2 h-5 w-5" />
                         </Button>
@@ -57,6 +108,87 @@ return (
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        {/* Recursos / Buscador */}
+        <section id="recursos" className="py-20 w-full">
+            <div className="container mx-auto px-4 w-full">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl lg:text-4xl font-bold mb-2">Recursos y <span className="text-primary">Artículos</span></h2>
+                    <p className="text-muted-foreground">Busca guías, mejores prácticas y casos de estudio para tu proyecto.</p>
+                </div>
+
+                <div className="max-w-3xl mx-auto mb-8">
+                    <div className="relative">
+                        <Input
+                            placeholder="Buscar recursos, guías o temas..."
+                            value={query}
+                            onChange={e => setQuery(e.target.value)}
+                            className="pr-12"
+                        />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                            <Search className="h-5 w-5" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6 w-full">
+                    {(filtered.length ? filtered : recursos).map(item => (
+                        <Card key={item.id} className="bg-card border-border">
+                            <CardContent className="p-6">
+                                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                                <p className="text-sm text-muted-foreground mb-4">{item.excerpt}</p>
+                                <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground bg-transparent w-full sm:w-auto">
+                                    Leer
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        {/* Galería / Catálogo de Imágenes */}
+        <section id="galeria" className="py-20 bg-card/50 w-full">
+            <div className="container mx-auto px-4 w-full">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl lg:text-4xl font-bold mb-2">Catálogo de <span className="text-primary">Proyectos</span></h2>
+                    <p className="text-muted-foreground">Mira ejemplos de diseños y productos entregados por Auris.</p>
+                </div>
+
+                <div className="max-w-6xl mx-auto">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 w-full border-border hover:border-primary/50 transition-all duration-300">
+                        {images.map((img, idx) => (
+                            <button key={idx} onClick={() => setLightboxIndex(idx)} className="overflow-hidden rounded-md bg-muted">
+                                <div className="w-full h-36 sm:h-40 md:h-48 lg:h-56 overflow-hidden">
+                                    <img
+                                        src={img.src}
+                                        alt={img.alt}
+                                        loading="lazy"
+                                        width="600"
+                                        height="300"
+                                        className="w-full h-full object-cover transition-transform hover:scale-105"
+                                    />
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Lightbox simple */}
+                {lightboxIndex >= 0 && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setLightboxIndex(-1)}>
+                        <div className="max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
+                            <img src={images[lightboxIndex].src} alt={images[lightboxIndex].alt} className="mx-auto max-h-[80vh] w-auto max-w-full rounded" />
+                            <div className="flex items-center justify-between mt-3">
+                                <Button variant="outline" onClick={(e) => { e.stopPropagation(); setLightboxIndex((lightboxIndex - 1 + images.length) % images.length) }}>Atrás</Button>
+                                <Button variant="outline" onClick={(e) => { e.stopPropagation(); setLightboxIndex((lightboxIndex + 1) % images.length) }}>Siguiente</Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </section>
         <section id="servicios" className="py-20 bg-card/50 w-full">
@@ -128,7 +260,7 @@ return (
                                     <span className="text-sm">Monitoreo y soporte 24/7</span>
                                 </li>
                             </ul>
-                            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground bg-transparent">
+                                <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground bg-transparent w-full sm:w-auto">
                                 Solicitar Cotización
                                 <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
@@ -284,7 +416,7 @@ return (
                                 <Textarea placeholder="Describe el problema y lo que quieres lograr" className="bg-input border-border min-h-[120px]" />
                             </div>
 
-                            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">Enviar Brief<ArrowRight className="ml-2 h-4 w-4" /></Button>
+                            <Button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">Enviar Brief<ArrowRight className="ml-2 h-4 w-4" /></Button>
                         </form>
                     </Card>
                 </div>
