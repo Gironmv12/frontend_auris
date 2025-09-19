@@ -19,10 +19,11 @@ export default function AurisLandingPage() {
         { id: 4, title: 'Optimización de rendimiento', excerpt: 'Técnicas para mejorar la performance en front y back.' },
     ]
 
+    // Las imágenes están en la carpeta `public/` — en producción Vite las sirve desde la raíz '/'
     const images = [
-        { src: '../public/galeria_animalis.webp', alt: 'Proyecto 1' },
-        { src: '../public/asis_control_galeria.webp', alt: 'Proyecto 2' },
-        { src: '../public/black_clasick_galeria.webp', alt: 'Proyecto 3' },
+        { src: '/galeria_animalis.webp', alt: 'Proyecto 1' },
+        { src: '/asis_control_galeria.webp', alt: 'Proyecto 2' },
+        { src: '/black_clasick_galeria.webp', alt: 'Proyecto 3' },
     ]
 
     const filtered = recursos.filter(r => (r.title + r.excerpt).toLowerCase().includes(query.toLowerCase()))
