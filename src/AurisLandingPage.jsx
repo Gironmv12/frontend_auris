@@ -20,9 +20,9 @@ export default function AurisLandingPage() {
     ]
 
     const images = [
-        { src: '/public/galeria_animalis.webp', alt: 'Proyecto 1' },
-        { src: '/public/asis_control_galeria.webp', alt: 'Proyecto 2' },
-        { src: '/public/black_clasick_galeria.webp', alt: 'Proyecto 3' },
+        { src: '../public/galeria_animalis.webp', alt: 'Proyecto 1' },
+        { src: '../public/asis_control_galeria.webp', alt: 'Proyecto 2' },
+        { src: '../public/black_clasick_galeria.webp', alt: 'Proyecto 3' },
     ]
 
     const filtered = recursos.filter(r => (r.title + r.excerpt).toLowerCase().includes(query.toLowerCase()))
